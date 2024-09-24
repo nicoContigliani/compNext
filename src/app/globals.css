@@ -1,11 +1,99 @@
 /* Estilos globales */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: F3F3F3;
+  /* Fondo similar a macOS */
+  /* display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-content: flex-start; */
+  box-sizing: border-box;
+  overflow-x: hidden;
+  background-color: rgba(255, 255, 255, 0.49);
+}
+
+
+/* Estilos para dispositivos móviles (ancho máximo de 767px) */
+@media (max-width: 767px) {
+
+  /* .container {
+    max-width: 90%;
+  } */
+  .container {
+    /* padding-left: 2%;
+    display: grid;
+    grid-template-columns: 1fr 3fr; 
+    gap: 5px; */
+    display: flex;
+    flex-direction: row; /* Asegurar que las columnas estén en una fila */
+    min-height: 100vh;
+    overflow: hidden;
+    
+
   }
-  
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f5f5f7; /* Fondo similar a macOS */
+
+  .columnaUno {
+    
+    padding: 5px;
+    padding-top: 8px;
+    padding-left: 3px;
+    padding-bottom: 10%;
+    width: 55px;
+    bottom:0.3;
+    color: #000000;
+    height: 50vh; /* Altura completa de la viewport */
+    position: fixed; /* Fija la posición */
+    top: 0; /* Posiciona en la parte superior */
+    z-index: 1; 
+    order: -1;
+    flex: 0 0 60px; 
+    box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.5);
   }
+
+  .columnaDos {
+    padding-left: 3px;
+    margin-top: 7px;
+    margin-left: 82px;
+    margin-right: 8px;
+    background-color:#F3F3F3;
+    flex: 1; /* Ocupa todo el espacio restante */
+    width: 100%;
+    height: 110vh; 
+    overflow: hidden;
+    overflow-x: hidden;
+    box-shadow: -1px 2px 10px 3px rgba(0, 0, 0, 0.262);
+    
+    border-radius: 15px;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+}
+
+/* Estilos para tablets y desktops (ancho mínimo de 768px) */
+@media (min-width: 768px) {
+
+  .container {
+    max-width: 80%;
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  .desktop-only {
+    display: block;
+  }
+}

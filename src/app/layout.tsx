@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+// import style from '@/components/siders/siderGeneral/SiderGeneral.module.css'
+import SiderGeneral from "@/components/siders/siderGeneral/SiderGeneral";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,9 +27,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      {/* <body className={`${geistSans.variable} ${geistMono.variable}`}> */}
+      <body>
+
+        <div className="container">
+
+          <div className="columnaUno">
+            <SiderGeneral />
+
+          </div>
+          <div className="columnaDos">
+
+            {children}
+
+          </div>
+        </div>
       </body>
-    </html>
+      {/* </body> */}
+    </html >
   );
 }

@@ -1,0 +1,60 @@
+/* Estilos para dispositivos móviles (ancho máximo de 767px) */
+@media (max-width: 767px) {
+
+  .container {
+    max-width: 80%;
+  }
+
+  .siderLeft {
+    /* width: 67px;
+    height: 966;
+    border-radius: 15%;
+    background-color: #F3F3F3; */
+    width: 60px;
+    
+    background-color:#F3F3F3;
+
+    color: #000000;
+    padding: 10px;
+    padding-left: 11px;
+    margin-left: 5px;
+    position: fixed;
+    top: 0.9;
+    right:0.3;
+    left:0.5;
+    bottom:0.9;
+
+    height: 100%;
+    height: 99%;
+    box-shadow: -3px 1px 5px 3px rgba(0, 0, 0, 0.262);
+    border-radius: 15px;
+    padding-top: 7%;
+    padding-bottom: 1%;
+  }
+
+
+
+  .mobile-only {
+    display: block;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+}
+
+/* Estilos para tablets y desktops (ancho mínimo de 768px) */
+@media (min-width: 768px) {
+
+  .container {
+    max-width: 80%;
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  .desktop-only {
+    display: block;
+  }
+}

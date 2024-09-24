@@ -1,9 +1,11 @@
+"use client"
+// import { generateToken } from '@/services/jwt.services';
 import React, { useState } from 'react';
 
 
 
 
-const Forms = (props: any) => {
+const Forms = (props: any|undefined) => {
   const { data, setData, inputBeforeGenerate } = props
 
   const [formData, setFormData] = useState<any>({});
@@ -44,19 +46,19 @@ const Forms = (props: any) => {
             max={input?.max}
           />
         );
-        case 'tel':
-          return (
-            <input
-              type="tel"
-              name={input?.name}
-              placeholder={input?.placeholder}
-              value={formData[input?.name] || ''}
-              onChange={handleChange}
-              step={input?.step}
-              min={input?.min}
-              max={input?.max}
-            />
-          );
+      case 'tel':
+        return (
+          <input
+            type="tel"
+            name={input?.name}
+            placeholder={input?.placeholder}
+            value={formData[input?.name] || ''}
+            onChange={handleChange}
+            step={input?.step}
+            min={input?.min}
+            max={input?.max}
+          />
+        );
 
       case 'range':
         return (
@@ -130,7 +132,10 @@ const Forms = (props: any) => {
     }
   };
 
-
+  const saveData = () => {
+    // const tokenReturn = generateToken({ id: 1, fullname: "Nicolas" })
+    // console.log("🚀 ~ saveData ~ tokenReturn:", tokenReturn)
+  }
 
 
   return (
@@ -145,6 +150,7 @@ const Forms = (props: any) => {
 
       {/* Muestra los datos ingresados */}
       <pre>{JSON.stringify(formData, null, 2)}</pre>
+      <button onClick={() => saveData()}>Submit</button>
     </>
   );
 };

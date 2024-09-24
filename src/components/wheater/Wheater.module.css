@@ -1,0 +1,107 @@
+/* WeatherComponent.module.css */
+.weatherCard {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: white;
+    padding: 0.5rem;
+    max-width: 22rem;
+    margin: 0 auto;
+    background: linear-gradient(to bottom right, #3b82f6, #8b5cf6);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .currentWeather {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .currentWeather h1 {
+    font-size: 2.25rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .currentWeather p:first-of-type {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .currentWeather p:last-of-type {
+    font-size: 0.875rem;
+  }
+  
+  .hourlyForecast {
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .hourlyForecast > div {
+    display: inline-flex;
+    gap: 1rem;
+  }
+  
+  .hourlyForecast > div {
+    display: inline-flex; /* Los hijos deben ser elementos inline-flex para que se alineen horizontalmente */
+    gap: 1rem; /* Añade espacio entre los elementos */
+  }
+  
+  .hourlyItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 4rem; /* Establece un ancho mínimo para cada elemento para que no sean demasiado pequeños */
+  }
+  
+  .hourlyItem span {
+    display: block; /* Asegúrate de que cada span se alinee como un bloque dentro del contenedor */
+  }
+  
+  .hourlyItem span:first-child {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .hourlyItem span:nth-child(2) {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .hourlyItem span:last-child {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .dailyInfo {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .dailyInfo > div {
+    display: flex;
+    align-items: center;
+  }
+  
+  .dailyInfo svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+
+
+  .toggleButton {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    text-decoration: underline;
+  }
+  
+  .toggleButton:hover {
+    color: #e0e0e0;
+  }
+  

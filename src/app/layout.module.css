@@ -1,28 +1,24 @@
 .container {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 5fr;
   /* Adjust column proportions as needed */
-  gap: 2px;
-  background-color: red;
+  gap: 5px;
 }
 
+.columnaUno {
+  /* Sidebar styles */
+  border-radius: 15%;
+}
+
+.columnaDos {
+  /* Main content styles */
+}
 
 /* Mobile */
 @media (max-width: 768px) {
-  /* .container {
+  .container {
     grid-template-columns: 1fr;
-  } */
-  .columnaUno {
-    /* Sidebar styles */
-    border-radius: 15%;
-    background-color: blue;
   }
-  
-  .columnaDos {
-    /* Main content styles */
-    background-color: red;
-  }
-  
 }
 
 /* Tablet */
