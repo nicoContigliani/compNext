@@ -9,28 +9,42 @@
 
 /* Mobile */
 @media (max-width: 768px) {
+
   /* .container {
     grid-template-columns: 1fr;
   } */
+  .container {}
+
   .columnaUno {
     /* Sidebar styles */
     border-radius: 15%;
     background-color: blue;
   }
-  
+
   .columnaDos {
     /* Main content styles */
-    background-color: red;
+    background-color: gold;
   }
-  
+
 }
 
-/* Tablet */
-@media (min-width: 769px) and (max-width: 991px) {
-  /* Tablet-specific styles */
-}
 
 /* Desktop */
-@media (min-width: 992px) {
+@media (min-width: 769px) {
+
   /* Desktop-specific styles */
+  .container {
+
+  }
+
+  .columnaUno {
+    /* Sidebar styles */
+    border-radius: 15%;
+    background-color: blue;
+  }
+
+  .columnaDos {
+    /* Main content styles */
+    background-color: gold;
+  }
 }

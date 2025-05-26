@@ -8,6 +8,7 @@ import style from './page.module.css'
 import { obtenerGeolocalizacion } from "@/services/geolocations.sevices";
 import axiosService from "@/services/axios.services";
 import WeatherComponent from "@/components/wheater/Wheater";
+import getHourlyForecast from "@/services/wheaterAll.services";
 
 export default function Home() {
   useEffect(() => {
@@ -30,34 +31,14 @@ export default function Home() {
 
 
   // // Reemplaza con tu clave API real
-  // const apiKey = 'TU_CLAVE_API';
 
-  // // Construye la URL de la solicitud
-  // const url = 'https://api.meteosource.com/v1/point/forecast';
-
-  // // Parámetros de la consulta (ajusta según tus necesidades)
-  // const params = {
-  //   lat: 37.7749,
-  //   lon: -122.4194,
-  //   sections: 'current,hourly',
-  //   units: 'metric',
-  // };
-
-
-
-  // const API_URL = `https://api.openweathermap.org/data/2.5/weather?q=${cityValue},${countryValue}&appid=${WEATHER_KEY}&units=metric`;
-
-
-
-  // const url = "https://api.meteosource.com/v1/point/forecast"
-  // const token = "titjvahndlqpw55t3333i0izchx4hc7k6fi4ujfe"
   const cityValue = 'Mendoza'
   const countryValue = "AR"
   const WEATHER_KEY = "2f32c842aa152561b4975095a4a8c746"
   // const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityValue},${countryValue}&appid=${WEATHER_KEY}&units=metric`;
-  
+
   useEffect(() => {
-    
+
     const todo = async () => {
       const returData: any = await obtenerGeolocalizacion()
       const lat = returData.latitude
@@ -77,28 +58,48 @@ export default function Home() {
     todo()
   }, [])
 
-  // https://pokeapi.co/api/v2/pokemon/ditto
+  const [forecast, setForecast] = useState<any[] | any | undefined>([]);
 
+  useEffect(() => {
+    const fetchForecast = async () => {
+      const returData: any = await obtenerGeolocalizacion()
+      const lat = returData.latitude
+      const lon = returData.longitude
+      const data: any | undefined = await getHourlyForecast(lat, lon, WEATHER_KEY, 0, 24); // Ejemplo de latitud y longitud
+      setForecast(data);
+    };
+
+    fetchForecast();
+  }, []);
 
 
 
 
   return (
-    <div className={style.container}>
-      {/* <AuthForm 
+    <div>
+      <header>
+        <WeatherComponent
+          forecast={forecast}
+        />
+
+      </header>
+
+      <div className={style.container}>
+        {/* <AuthForm 
       isLogin={isLogin} 
       setIsLogin={setIsLogin} 
       isAuthenticated={isAuthenticated} 
       setIsAuthenticated={setIsAuthenticated}
     /> */}
-      {/* <div className={style.columnaUno}>
+        {/* <div className={style.columnaUno}>
         <h1>Home</h1>
 
       </div>
       <div className={style.columnaDos}>
         dos
       </div> */}
-      <WeatherComponent/>
+        si
+      </div>
     </div>
   );
 }

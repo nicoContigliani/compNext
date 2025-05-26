@@ -1,107 +1,157 @@
-/* WeatherComponent.module.css */
 .weatherCard {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    color: white;
-    padding: 0.5rem;
-    max-width: 22rem;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1c1c1e; /* Cambia a un color oscuro para el texto */
+  padding: 0.3rem;
+  padding-top: 1%;
+  margin-left: 1%;
+  padding-right: 3%;
+  background: linear-gradient(to bottom right, #f0f0f5, #ffffff); /* Fondo blanco-gris para un toque suave */
+  border-radius: 1rem; /* Bordes redondeados */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); /* Sombra suave */
+  max-width: 25rem; /* Ancho más compacto */
+  margin: 0 auto;
+  transition: max-height 0.3s ease, width 0.3s ease;
+  width: 100%;
+  
+}
+
+.currentWeather {
+  display: flex;
+  flex-direction: row; /* Originally set to row */
+  justify-content: space-around;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.1rem;
+  border-radius: 1rem;
+  background-color: #f8f9fa75; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.268); /* Sombra suave */
+  transition: background-color 0.2s ease;
+}
+
+.currentWeather:hover {
+  background-color: #e2e3e5; /* Fondo más oscuro al hacer hover */
+}
+
+.weatherDetails {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem; /* Espacio entre los elementos */
+}
+
+.weatherDetails h1 {
+  font-size: 2.5rem; /* Tamaño grande y elegante */
+  margin: 0;
+}
+
+.weatherDetails h4 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #8e8e93; /* Texto en color gris suave */
+}
+
+.toggleButton {
+  background: none;
+  border: none;
+  color: #007aff; /* Color azul estilo iOS */
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.toggleButton:hover {
+  color: #005bb5; /* Color azul más oscuro al hacer hover */
+}
+
+.hourlyForecast, .dailyInfo {
+  margin-top: 1.5rem;
+  color: #1c1c1e; /* Texto en color oscuro */
+}
+
+.hourlyForecast {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem; /* Espacio entre los items */
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.hourlyItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0f0f5;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  min-width: 4rem;
+}
+
+.dailyInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.dailyInfo > div {
+  display: flex;
+  align-items: center;
+}
+
+.dailyInfo svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  color: #007aff; /* Azul estilo Mac */
+}
+
+.expanded {
+  max-height: 500px;
+  width: 100%;
+}
+
+.collapsed {
+  max-height: 120px;
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 767px) {
+  .weatherCard {
+    max-width: 100%; /* Asegura que ocupe el ancho completo en móvil */
+    width: 100%; /* Deja algo de espacio en los bordes en pantallas pequeñas */
     margin: 0 auto;
-    background: linear-gradient(to bottom right, #3b82f6, #8b5cf6);
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
   
   .currentWeather {
-    margin-bottom: 1.5rem;
-    text-align: center;
-  }
-  
-  .currentWeather h1 {
-    font-size: 2.25rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-  
-  .currentWeather p:first-of-type {
-    font-size: 1.25rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  .currentWeather p:last-of-type {
-    font-size: 0.875rem;
-  }
-  
-  .hourlyForecast {
-    margin-bottom: 1.5rem;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-  
-  .hourlyForecast > div {
-    display: inline-flex;
-    gap: 1rem;
-  }
-  
-  .hourlyForecast > div {
-    display: inline-flex; /* Los hijos deben ser elementos inline-flex para que se alineen horizontalmente */
-    gap: 1rem; /* Añade espacio entre los elementos */
-  }
-  
-  .hourlyItem {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 4rem; /* Establece un ancho mínimo para cada elemento para que no sean demasiado pequeños */
-  }
-  
-  .hourlyItem span {
-    display: block; /* Asegúrate de que cada span se alinee como un bloque dentro del contenedor */
-  }
-  
-  .hourlyItem span:first-child {
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  .hourlyItem span:nth-child(2) {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  .hourlyItem span:last-child {
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-  
-  .dailyInfo {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    font-size: 0.875rem;
-  }
-  
-  .dailyInfo > div {
-    display: flex;
-    align-items: center;
-  }
-  
-  .dailyInfo svg {
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.5rem;
+    justify-content: space-between;
+
   }
 
+  .currentWeather h4 {
+    font-size: 1.5rem; /* Aumenta el tamaño del texto */
+  }
 
-  .toggleButton {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 0.875rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    text-decoration: underline;
+  .weatherDetails h1 {
+    font-size: 2rem; /* Ajusta el tamaño del encabezado */
   }
-  
-  .toggleButton:hover {
-    color: #e0e0e0;
+
+  .weatherDetails h4 {
+    font-size: 1rem; /* Ajusta el tamaño del subtítulo */
   }
+
+  .hourlyForecast {
+    overflow-x: auto; /* Permite scroll horizontal */
+
   
+  }
+}
