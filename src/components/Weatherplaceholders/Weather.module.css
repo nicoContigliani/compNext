@@ -1,0 +1,148 @@
+.weatherCard {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  .collapsed {
+    max-height: 200px;
+  }
+  
+  .expanded {
+    max-height: 1000px;
+  }
+  
+  .titleCenter {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .titleCenter h1 {
+    font-size: 3rem;
+    font-weight: 300;
+    margin: 0;
+    color: #333;
+  }
+  
+  .currentWeather {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .weatherDetails {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .location {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  .conditionsCenter {
+    font-size: 1.3rem;
+    margin: 10px 0;
+    color: #444;
+    text-transform: capitalize;
+  }
+  
+  .weatherIcon {
+    font-size: 2.5rem;
+    margin: 10px 0;
+  }
+  
+  .divider {
+    border: none;
+    height: 1px;
+    background-color: #eee;
+    width: 80%;
+    margin: 15px auto;
+  }
+  
+  .hourlyForecast {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 10px 0;
+    margin: 15px 0;
+  }
+  
+  .hourlyItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .hourlyIcon {
+    margin: 5px 0;
+    font-size: 1.5rem;
+  }
+  
+  .popChance {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #4a89dc;
+    margin-top: 3px;
+  }
+  
+  .dailyInfo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  
+  .infoItem {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+  }
+  
+  .infoIcon {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  /* Weather icon colors */
+  .sunIcon {
+    color: #f6b93b;
+  }
+  
+  .moonIcon {
+    color: #e6e6e6;
+  }
+  
+  .partlyCloudyIcon {
+    color: #a4b0be;
+  }
+  
+  .cloudyIcon {
+    color: #7f8c8d;
+  }
+  
+  .rainIcon {
+    color: #4a69bd;
+  }
+  
+  .thunderstormIcon {
+    color: #8e44ad;
+  }
+  
+  .snowIcon {
+    color: #dfe6e9;
+  }
