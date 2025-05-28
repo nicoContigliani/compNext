@@ -19,30 +19,30 @@ export default function Home() {
     redden({ email: 'nico.contigliani' });
   }, []);
 
-  useEffect(() => {
-    const fetchCurrentWeather = async () => {
-      const returData: any = await obtenerGeolocalizacion();
-      const { latitude: lat, longitude: lon } = returData;
+  // useEffect(() => {
+  //   const fetchCurrentWeather = async () => {
+  //     const returData: any = await obtenerGeolocalizacion();
+  //     const { latitude: lat, longitude: lon } = returData;
 
-      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`;
-      const getData = await axiosService({ method: 'GET', url });
-      console.log("🚀 ~ Current Weather Data:", getData);
-    };
+  //     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric`;
+  //     const getData = await axiosService({ method: 'GET', url });
+  //     console.log("🚀 ~ Current Weather Data:", getData);
+  //   };
 
-    fetchCurrentWeather();
-  }, []);
+  //   fetchCurrentWeather();
+  // }, []);
 
-  useEffect(() => {
-    const fetchForecast = async () => {
-      const returData: any = await obtenerGeolocalizacion();
-      const { latitude: lat, longitude: lon } = returData;
+  // useEffect(() => {
+  //   const fetchForecast = async () => {
+  //     const returData: any = await obtenerGeolocalizacion();
+  //     const { latitude: lat, longitude: lon } = returData;
 
-      const data: any = await getHourlyForecast(lat, lon, WEATHER_KEY, 0, 24);
-      setForecast(data);
-    };
+  //     const data: any = await getHourlyForecast(lat, lon, WEATHER_KEY, 0, 24);
+  //     setForecast(data);
+  //   };
 
-    fetchForecast();
-  }, []);
+  //   fetchForecast();
+  // }, []);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 2 }}>
@@ -52,7 +52,7 @@ export default function Home() {
           <Typography variant="h5" gutterBottom>
             Pronóstico del Clima
           </Typography>
-          <WeatherComponent forecast={forecast} />
+          {/* <WeatherComponent forecast={forecast} /> */}
         </Paper>
       </Box>
 
