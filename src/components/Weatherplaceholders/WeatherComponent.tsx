@@ -1,521 +1,23 @@
-
-// import React, { useState, useEffect } from 'react';
-// import { motion, AnimatePresence } from 'framer-motion';
-// import {
-//   Sun, Sunrise, Sunset, Wind, Cloud, Droplet, Thermometer,
-//   MapPin, Loader2, Umbrella, Gauge, CloudRain, CloudDrizzle,
-//   CloudLightning, CloudSnow, Eye, Navigation, ChevronDown, ChevronUp
-// } from 'lucide-react';
-// import axios from 'axios';
-
-// interface WeatherData {
-//   temp: number;
-//   feels_like: number;
-//   humidity: number;
-//   condition: string;
-//   icon: string;
-//   high: number;
-//   low: number;
-//   wind_speed: number;
-//   wind_deg: number;
-//   sunrise: number;
-//   sunset: number;
-//   pressure: number;
-//   visibility: number;
-//   rain?: number;
-//   pop?: number;
-//   airQuality?: number;
-//   description: string;
-//   timezone: number;
-// }
-
-// interface HourlyForecast {
-//   time: string;
-//   temp: number;
-//   icon: string;
-//   pop: number;
-//   rain?: number;
-// }
-
-// interface DailyForecast {
-//   day: string;
-//   high: number;
-//   low: number;
-//   icon: string;
-//   pop: number;
-// }
-
-// const WeatherDashboard = () => {
-//   const [weather, setWeather] = useState<WeatherData | null>(null);
-//   const [hourlyForecast, setHourlyForecast] = useState<HourlyForecast[]>([]);
-//   const [dailyForecast, setDailyForecast] = useState<DailyForecast[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-//   const [location, setLocation] = useState('Mendoza, AR');
-//   const [activeTab, setActiveTab] = useState<'today' | 'week'>('today');
-//   const [expanded, setExpanded] = useState(false);
-
-//   const WEATHER_KEY = "2f32c842aa152561b4975095a4a8c746";
-//   const MENDOZA_COORDS = { lat: -32.8908, lon: -68.8272 };
-
-//   const getWeatherIcon = (iconCode: string, size = 24) => {
-//     const icons: Record<string, JSX.Element> = {
-//       '01d': <Sun className="text-yellow-400" size={size} />,
-//       '01n': <Sun className="text-yellow-200" size={size} />,
-//       '02d': <Cloud className="text-gray-400" size={size} />,
-//       '02n': <Cloud className="text-gray-300" size={size} />,
-//       '03d': <Cloud className="text-gray-500" size={size} />,
-//       '03n': <Cloud className="text-gray-400" size={size} />,
-//       '04d': <Cloud className="text-gray-600" size={size} />,
-//       '04n': <Cloud className="text-gray-500" size={size} />,
-//       '09d': <CloudRain className="text-blue-400" size={size} />,
-//       '09n': <CloudRain className="text-blue-300" size={size} />,
-//       '10d': <CloudDrizzle className="text-blue-500" size={size} />,
-//       '10n': <CloudDrizzle className="text-blue-400" size={size} />,
-//       '11d': <CloudLightning className="text-purple-500" size={size} />,
-//       '11n': <CloudLightning className="text-purple-400" size={size} />,
-//       '13d': <CloudSnow className="text-blue-200" size={size} />,
-//       '13n': <CloudSnow className="text-blue-100" size={size} />,
-//       '50d': <Cloud className="text-gray-300" size={size} />,
-//       '50n': <Cloud className="text-gray-200" size={size} />,
-//     };
-
-//     const animationProps = {
-//       animate: {
-//         rotate: [0, 0],
-//         y: [0, -5, 0],
-//       },
-//       transition: {
-//         duration: 3,
-//         repeat: Infinity,
-//         repeatType: "loop" as const,
-//       },
-//     };
-
-//     return (
-//       <motion.div {...animationProps}>
-//         {icons[iconCode] || <Cloud size={size} />}
-//       </motion.div>
-//     );
-//   };
-
-//   const formatTime = (timestamp: number, timezone: number) => {
-//     return new Date((timestamp + timezone) * 1000)
-//       .toLocaleTimeString([], { hour: '2-digit' })
-//       .replace(' ', '');
-//   };
-
-//   const formatDay = (timestamp: number, timezone: number) => {
-//     return new Date((timestamp + timezone) * 1000)
-//       .toLocaleDateString([], { weekday: 'short' });
-//   };
-
-//   const getWindDirection = (degrees: number) => {
-//     const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-//     const index = Math.round((degrees % 360) / 45);
-//     return directions[index % 8];
-//   };
-
-//   const getAirQuality = (index?: number) => {
-//     if (!index) return { level: 'N/A', color: 'gray', bgColor: 'bg-gray-100' };
-
-//     const levels = [
-//       { level: 'Excelente', color: 'text-emerald-600', bgColor: 'bg-emerald-100' },
-//       { level: 'Buena', color: 'text-green-600', bgColor: 'bg-green-100' },
-//       { level: 'Moderada', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-//       { level: 'Pobre', color: 'text-orange-600', bgColor: 'bg-orange-100' },
-//       { level: 'Muy pobre', color: 'text-red-600', bgColor: 'bg-red-100' },
-//       { level: 'Peligrosa', color: 'text-purple-600', bgColor: 'bg-purple-100' }
-//     ];
-
-//     return levels[Math.min(index - 1, 5)];
-//   };
-
-//   const fetchWeatherData = async () => {
-//     try {
-//       setLoading(true);
-//       const { lat, lon } = MENDOZA_COORDS;
-
-//       const [currentRes, forecastRes] = await Promise.all([
-//         axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_KEY}&units=metric&lang=es`),
-//         axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${WEATHER_KEY}&units=metric&cnt=40`)
-//       ]);
-
-//       const currentData = currentRes.data;
-//       const forecastData = forecastRes.data;
-
-//       setWeather({
-//         temp: Math.round(currentData.main.temp),
-//         feels_like: Math.round(currentData.main.feels_like),
-//         humidity: currentData.main.humidity,
-//         condition: currentData.weather[0].main,
-//         description: currentData.weather[0].description,
-//         icon: currentData.weather[0].icon,
-//         high: Math.round(currentData.main.temp_max),
-//         low: Math.round(currentData.main.temp_min),
-//         wind_speed: Math.round(currentData.wind.speed * 3.6),
-//         wind_deg: currentData.wind.deg,
-//         sunrise: currentData.sys.sunrise,
-//         sunset: currentData.sys.sunset,
-//         pressure: currentData.main.pressure,
-//         visibility: currentData.visibility / 1000,
-//         rain: currentData.rain?.['1h'],
-//         pop: forecastData.list[0].pop * 100,
-//         timezone: currentData.timezone,
-//         airQuality: Math.floor(Math.random() * 5) + 1
-//       });
-
-//       const hourly = forecastData.list.slice(0, 12).map((item: any) => ({
-//         time: formatTime(item.dt, currentData.timezone),
-//         temp: Math.round(item.main.temp),
-//         icon: item.weather[0].icon,
-//         pop: Math.round(item.pop * 100),
-//         rain: item.rain?.['3h']
-//       }));
-//       setHourlyForecast(hourly);
-
-//       const daily: DailyForecast[] = [];
-//       for (let i = 0; i < 40; i += 8) {
-//         const dayData = forecastData.list[i];
-//         const temps = forecastData.list.slice(i, i + 8).map((item: any) => item.main.temp);
-//         daily.push({
-//           day: formatDay(dayData.dt, currentData.timezone),
-//           high: Math.round(Math.max(...temps)),
-//           low: Math.round(Math.min(...temps)),
-//           icon: dayData.weather[0].icon,
-//           pop: Math.round(
-//             Math.max(...forecastData.list.slice(i, i + 8).map((item: any) => item.pop * 100))
-//           )
-//         });
-//       }
-//       setDailyForecast(daily);
-
-//       setLoading(false);
-//     } catch (err) {
-//       console.error("Error fetching weather data:", err);
-//       setError("No se pudo cargar la información meteorológica. Intenta nuevamente.");
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchWeatherData();
-//   }, []);
-
-//   if (loading) {
-//     return (
-//       <div className="flex items-center justify-center min-h-[400px]">
-//         <motion.div
-//           animate={{ rotate: 360 }}
-//           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-//           className="flex flex-col items-center"
-//         >
-//           <Loader2 className="w-12 h-12 text-blue-500 mb-2" />
-//           <p className="text-gray-500">Cargando datos meteorológicos...</p>
-//         </motion.div>
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="p-6 text-center bg-red-50 rounded-xl border border-red-100 max-w-md mx-auto">
-//         <div className="text-red-500 font-medium mb-2">{error}</div>
-//         <button
-//           onClick={fetchWeatherData}
-//           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-//         >
-//           Reintentar
-//         </button>
-//       </div>
-//     );
-//   }
-
-//   if (!weather) return null;
-
-//   const airQuality = getAirQuality(weather.airQuality);
-
-//   return (
-//     <div className="max-w-6xl mx-auto p-4">
-//       {/* Main Weather Card */}
-//       <motion.div
-//         className="bg-white rounded-xl shadow-lg overflow-hidden"
-//         initial={{ opacity: 0, y: 20 }}
-//         animate={{ opacity: 1, y: 0 }}
-//         transition={{ duration: 0.5 }}
-//       >
-//         {/* Current Weather Header */}
-//         <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
-//           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-//             <div>
-//               <div className="flex items-center text-lg font-medium mb-1">
-//                 <MapPin size={18} className="mr-2" />
-//                 <span>{location}</span>
-//               </div>
-//               <div className="text-sm opacity-90 capitalize">{weather.description}</div>
-//             </div>
-            
-//             <motion.div
-//               className="flex items-center gap-4"
-//               animate={{ scale: [1, 1.02, 1] }}
-//               transition={{ duration: 5, repeat: Infinity }}
-//             >
-//               <div className="text-5xl font-light">{weather.temp}°</div>
-//               <div className="text-4xl">
-//                 {getWeatherIcon(weather.icon, 48)}
-//               </div>
-//             </motion.div>
-//           </div>
-//         </div>
-
-//         {/* Weather Stats Grid */}
-//         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6">
-//           <div className="bg-gray-50 p-4 rounded-lg">
-//             <div className="flex items-center text-gray-500 text-sm mb-2">
-//               <Thermometer size={16} className="mr-2" />
-//               <span>Máx/Mín</span>
-//             </div>
-//             <div className="text-xl font-medium">
-//               {weather.high}° / {weather.low}°
-//             </div>
-//           </div>
-          
-//           <div className="bg-gray-50 p-4 rounded-lg">
-//             <div className="flex items-center text-gray-500 text-sm mb-2">
-//               <Droplet size={16} className="mr-2" />
-//               <span>Humedad</span>
-//             </div>
-//             <div className="text-xl font-medium">{weather.humidity}%</div>
-//           </div>
-          
-//           <div className="bg-gray-50 p-4 rounded-lg">
-//             <div className="flex items-center text-gray-500 text-sm mb-2">
-//               <Wind size={16} className="mr-2" />
-//               <span>Viento</span>
-//             </div>
-//             <div className="text-xl font-medium">
-//               {weather.wind_speed} km/h <span className="text-sm">{getWindDirection(weather.wind_deg)}</span>
-//             </div>
-//           </div>
-          
-//           <div className="bg-gray-50 p-4 rounded-lg">
-//             <div className="flex items-center text-gray-500 text-sm mb-2">
-//               <Umbrella size={16} className="mr-2" />
-//               <span>Precipitación</span>
-//             </div>
-//             <div className="text-xl font-medium">
-//               {weather.pop}% {weather.rain && `(${weather.rain}mm)`}
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Tab Navigation */}
-//         <div className="border-t border-gray-200 flex">
-//           <button
-//             className={`flex-1 py-4 font-medium ${activeTab === 'today' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-//             onClick={() => setActiveTab('today')}
-//           >
-//             Hoy
-//           </button>
-//           <button
-//             className={`flex-1 py-4 font-medium ${activeTab === 'week' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-//             onClick={() => setActiveTab('week')}
-//           >
-//             Próximos 5 días
-//           </button>
-//         </div>
-
-//         {/* Tab Content */}
-//         <div className="p-6">
-//           {activeTab === 'today' ? (
-//             <>
-//               {/* Hourly Forecast */}
-//               <h3 className="text-lg font-semibold text-gray-800 mb-4">Pronóstico por horas</h3>
-//               <div className="overflow-x-auto pb-4">
-//                 <div className="flex space-x-4 min-w-max">
-//                   {hourlyForecast.map((hour, index) => (
-//                     <motion.div
-//                       key={index}
-//                       className="bg-gray-50 p-3 rounded-lg min-w-[80px] text-center"
-//                       initial={{ opacity: 0, y: 10 }}
-//                       animate={{ opacity: 1, y: 0 }}
-//                       transition={{ delay: index * 0.1 }}
-//                     >
-//                       <div className="text-sm font-medium text-gray-500">{hour.time}</div>
-//                       <div className="my-2 flex justify-center">
-//                         {getWeatherIcon(hour.icon, 28)}
-//                       </div>
-//                       <div className="text-lg font-medium">{hour.temp}°</div>
-//                       {hour.pop > 20 && (
-//                         <div className="flex items-center justify-center mt-1 text-xs text-blue-500">
-//                           <Umbrella size={12} className="mr-1" />
-//                           <span>{hour.pop}%</span>
-//                         </div>
-//                       )}
-//                     </motion.div>
-//                   ))}
-//                 </div>
-//               </div>
-
-//               {/* Additional Weather Details */}
-//               <div className="mt-6">
-//                 <div className="flex justify-between items-center mb-4">
-//                   <h3 className="text-lg font-semibold text-gray-800">Detalles del clima</h3>
-//                   <button 
-//                     onClick={() => setExpanded(!expanded)}
-//                     className="text-blue-500 text-sm flex items-center"
-//                   >
-//                     {expanded ? (
-//                       <>
-//                         <ChevronUp size={16} className="mr-1" />
-//                         Mostrar menos
-//                       </>
-//                     ) : (
-//                       <>
-//                         <ChevronDown size={16} className="mr-1" />
-//                         Mostrar más
-//                       </>
-//                     )}
-//                   </button>
-//                 </div>
-
-//                 <AnimatePresence>
-//                   {expanded && (
-//                     <motion.div
-//                       initial={{ opacity: 0, height: 0 }}
-//                       animate={{ opacity: 1, height: 'auto' }}
-//                       exit={{ opacity: 0, height: 0 }}
-//                       transition={{ duration: 0.3 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-//                         {/* Sunrise/Sunset */}
-//                         <div className="bg-gray-50 p-4 rounded-lg">
-//                           <div className="flex items-center text-gray-600 font-medium mb-3">
-//                             <Sunrise size={18} className="mr-2 text-amber-500" />
-//                             <span>Amanecer/Atardecer</span>
-//                           </div>
-//                           <div className="flex justify-between">
-//                             <div>
-//                               <div className="text-xl font-light">
-//                                 {new Date(weather.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-//                               </div>
-//                               <div className="text-xs text-gray-500">Amanecer</div>
-//                             </div>
-//                             <div>
-//                               <div className="text-xl font-light">
-//                                 {new Date(weather.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-//                               </div>
-//                               <div className="text-xs text-gray-500">Atardecer</div>
-//                             </div>
-//                           </div>
-//                         </div>
-
-//                         {/* Pressure */}
-//                         <div className="bg-gray-50 p-4 rounded-lg">
-//                           <div className="flex items-center text-gray-600 font-medium mb-3">
-//                             <Gauge size={18} className="mr-2 text-indigo-500" />
-//                             <span>Presión</span>
-//                           </div>
-//                           <div className="flex items-end">
-//                             <div className="text-xl font-light mr-2">{weather.pressure}</div>
-//                             <div className="text-gray-500 text-sm">hPa</div>
-//                           </div>
-//                           <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-//                             <motion.div
-//                               className={`h-full ${weather.pressure > 1020 ? 'bg-green-500' :
-//                                 weather.pressure < 1000 ? 'bg-red-500' : 'bg-yellow-500'
-//                                 }`}
-//                               initial={{ width: 0 }}
-//                               animate={{ width: `${((weather.pressure - 970) / (1030 - 970)) * 100}%` }}
-//                               transition={{ duration: 1 }}
-//                             />
-//                           </div>
-//                         </div>
-
-//                         {/* Visibility */}
-//                         <div className="bg-gray-50 p-4 rounded-lg">
-//                           <div className="flex items-center text-gray-600 font-medium mb-3">
-//                             <Eye size={18} className="mr-2 text-blue-500" />
-//                             <span>Visibilidad</span>
-//                           </div>
-//                           <div className="flex items-end">
-//                             <div className="text-xl font-light mr-2">{weather.visibility}</div>
-//                             <div className="text-gray-500 text-sm">km</div>
-//                           </div>
-//                           <div className="mt-1 text-xs text-gray-500">
-//                             {weather.visibility > 10 ? 'Excelente' :
-//                               weather.visibility > 5 ? 'Buena' :
-//                                 weather.visibility > 2 ? 'Moderada' : 'Reducida'}
-//                           </div>
-//                         </div>
-
-//                         {/* Air Quality */}
-//                         <div className={`p-4 rounded-lg ${airQuality.bgColor}`}>
-//                           <div className="flex items-center font-medium mb-3">
-//                             <Navigation size={18} className={`mr-2 ${airQuality.color}`} />
-//                             <span className={airQuality.color}>Calidad del aire</span>
-//                           </div>
-//                           <div className="flex items-end">
-//                             <div className={`text-xl font-light mr-2 ${airQuality.color}`}>
-//                               {airQuality.level}
-//                             </div>
-//                           </div>
-//                           <div className="mt-1 text-xs text-gray-600">
-//                             Índice AQI: {weather.airQuality || '--'}
-//                           </div>
-//                         </div>
-//                       </div>
-//                     </motion.div>
-//                   )}
-//                 </AnimatePresence>
-//               </div>
-//             </>
-//           ) : (
-//             /* Weekly Forecast */
-//             <div className="space-y-4">
-//               <h3 className="text-lg font-semibold text-gray-800 mb-4">Pronóstico semanal</h3>
-//               {dailyForecast.map((day, index) => (
-//                 <motion.div
-//                   key={index}
-//                   className="grid grid-cols-12 items-center p-3 bg-gray-50 rounded-lg"
-//                   initial={{ opacity: 0, x: -20 }}
-//                   animate={{ opacity: 1, x: 0 }}
-//                   transition={{ delay: index * 0.1 }}
-//                 >
-//                   <div className="col-span-2 font-medium text-gray-700">{index === 0 ? 'Hoy' : day.day}</div>
-//                   <div className="col-span-2 flex justify-center">
-//                     {getWeatherIcon(day.icon, 28)}
-//                   </div>
-//                   <div className="col-span-5">
-//                     {day.pop > 30 && (
-//                       <div className="flex items-center text-blue-500 text-sm">
-//                         <Umbrella size={14} className="mr-1" />
-//                         <span>{day.pop}% probabilidad de lluvia</span>
-//                       </div>
-//                     )}
-//                   </div>
-//                   <div className="col-span-3 flex justify-end space-x-2">
-//                     <span className="font-medium">{day.high}°</span>
-//                     <span className="text-gray-400">{day.low}°</span>
-//                   </div>
-//                 </motion.div>
-//               ))}
-//             </div>
-//           )}
-//         </div>
-//       </motion.div>
-//     </div>
-//   );
-// };
-
-// export default WeatherDashboard;
-
-
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Sun, Sunrise, Sunset, Wind, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Avatar,
+  Card,
+  CardContent,
+  useTheme,
+  Alert
+} from '@mui/material';
+import {
+  Thermostat,
+  Air,
+  Brightness5,
+  Brightness3,
+  LocationOn
+} from '@mui/icons-material';
+import { LineChart, Line, XAxis, ResponsiveContainer } from 'recharts';
 
 interface WeatherData {
   temp: number;
@@ -526,43 +28,92 @@ interface WeatherData {
   wind_speed: number;
   sunrise: number;
   sunset: number;
-  timezone: number;
+}
+
+interface DailyForecast {
+  date: string;
+  day: string;
+  high: number;
+  low: number;
+  icon: string;
+  hourly: {
+    time: string;
+    temp: number;
+  }[];
 }
 
 const WeatherDashboard = () => {
+  const theme = useTheme();
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [forecast, setForecast] = useState<DailyForecast[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
-
-  const WEATHER_KEY = "2f32c842aa152561b4975095a4a8c746";
+  const [error, setError] = useState<string | null>(null);
   const MENDOZA_COORDS = { lat: -32.8908, lon: -68.8272 };
 
   const fetchWeatherData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const { lat, lon } = MENDOZA_COORDS;
+
+      if (!process.env.NEXT_PUBLIC_WEATHER_KEY) {
+        throw new Error('API key no configurada');
+      }
 
       const currentRes = await axios.get(
         `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric&lang=es`
       );
 
+      const forecastRes = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric&lang=es`
+      );
+
       const currentData = currentRes.data;
+      const forecastData = forecastRes.data;
 
       setWeather({
         temp: Math.round(currentData.main.temp),
         high: Math.round(currentData.main.temp_max),
         low: Math.round(currentData.main.temp_min),
-        condition: currentData.weather[0].main,
+        condition: currentData.weather[0].description,
         icon: currentData.weather[0].icon,
         wind_speed: Math.round(currentData.wind.speed * 3.6),
         sunrise: currentData.sys.sunrise,
         sunset: currentData.sys.sunset,
-        timezone: currentData.timezone,
       });
 
+      const dailyForecast: Record<string, DailyForecast> = {};
+
+      forecastData.list.forEach((item: any) => {
+        const date = new Date(item.dt * 1000);
+        const dateKey = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+        const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
+        
+        if (!dailyForecast[dateKey]) {
+          dailyForecast[dateKey] = {
+            date: dateKey,
+            day: dayName,
+            high: Math.round(item.main.temp_max),
+            low: Math.round(item.main.temp_min),
+            icon: item.weather[0].icon,
+            hourly: []
+          };
+        }
+
+        dailyForecast[dateKey].high = Math.max(dailyForecast[dateKey].high, Math.round(item.main.temp_max));
+        dailyForecast[dateKey].low = Math.min(dailyForecast[dateKey].low, Math.round(item.main.temp_min));
+
+        dailyForecast[dateKey].hourly.push({
+          time: date.toLocaleTimeString('es-ES', { hour: '2-digit' }),
+          temp: Math.round(item.main.temp)
+        });
+      });
+
+      setForecast(Object.values(dailyForecast).slice(0, 5));
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching weather data:", err);
+      console.error('Error fetching weather data:', err);
+      setError('No se pudo cargar los datos del clima. Verifica tu conexión o API key.');
       setLoading(false);
     }
   };
@@ -571,90 +122,520 @@ const WeatherDashboard = () => {
     fetchWeatherData();
   }, []);
 
+  const formatTime = (timestamp: number) => {
+    return new Date(timestamp * 1000).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <p className="text-gray-500">Cargando datos meteorológicos...</p>
-      </div>
+      <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+        <CircularProgress />
+      </Box>
     );
   }
 
-  if (!weather) return null;
+  if (error) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">{error}</Alert>
+        <Typography variant="body1" mt={2}>
+          ¿Necesitas ayuda? Verifica:
+        </Typography>
+        <ul>
+          <li>Tu conexión a internet</li>
+          <li>Que la API key esté configurada correctamente</li>
+          <li>Que las coordenadas sean válidas</li>
+        </ul>
+      </Box>
+    );
+  }
 
-  const formatTime = (timestamp: number) => {
-    return new Date(timestamp * 1000)
-      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      .replace(' ', '');
-  };
+  if (!weather) {
+    return (
+      <Box p={3}>
+        <Alert severity="warning">No se encontraron datos meteorológicos</Alert>
+      </Box>
+    );
+  }
 
   return (
-    <div className="max-w-md mx-auto p-4 font-sans">
-      {/* Current Weather */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        {/* Current Temp */}
-        <div className="text-center mb-6">
-          <div className="text-5xl font-light text-gray-800">{weather.temp}°C</div>
-        </div>
-        
-        {/* Location and Condition */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <div className="text-xl font-medium text-gray-800">Mendoza</div>
-            <div className="text-gray-500 capitalize">{weather.condition}</div>
-          </div>
-          <div className="text-gray-800">
-            {weather.high}° / {weather.low}°
-          </div>
-        </div>
-        
-        {/* Hourly Forecast */}
-        <div className="flex justify-between mb-6">
-          {['03 p. m.', '06 p. m.', '09 p. m.', '12 a. m.'].map((time, index) => (
-            <div key={index} className="text-center">
-              <div className="text-gray-500 text-sm">{time}</div>
-              <div className="text-gray-800 mt-1">8°</div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Expandable Details */}
-        <div className="border-t border-gray-100 pt-4">
-          <button 
-            onClick={() => setExpanded(!expanded)}
-            className="w-full flex justify-between items-center text-gray-700"
-          >
-            <span>Detalles</span>
-            {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
-          
-          {expanded && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              transition={{ duration: 0.3 }}
-              className="mt-4 space-y-3"
-            >
-              <div className="flex items-center">
-                <Sunrise className="text-gray-500 mr-2" size={18} />
-                <span className="text-gray-700">Amanecer: {formatTime(weather.sunrise)}</span>
-              </div>
-              <div className="flex items-center">
-                <Sunset className="text-gray-500 mr-2" size={18} />
-                <span className="text-gray-700">Atardecer: {formatTime(weather.sunset)}</span>
-              </div>
-              <div className="flex items-center">
-                <Wind className="text-gray-500 mr-2" size={18} />
-                <span className="text-gray-700">Viento: {weather.wind_speed} km/h</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-gray-700">Calidad del Aire: Good</span>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </div>
-    </div>
+    <Box
+      p={2}
+      maxWidth="1000px"
+      mx="auto"
+      display="flex"
+      flexDirection="column"
+      gap={2}
+    >
+      {/* Encabezado corregido - Typography ahora está correctamente cerrado */}
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h6" fontWeight={500} display="flex" alignItems="center" gap={0.5}>
+          <LocationOn fontSize="small" /> Clima en Mendoza
+        </Typography>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Avatar
+            src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+            sx={{ width: 50, height: 50 }}
+          />
+          <Box textAlign="right">
+            <Typography variant="h4" fontWeight={600}>
+              {weather.temp}°C
+            </Typography>
+            <Typography variant="caption" textTransform="capitalize">
+              {weather.condition}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Datos principales */}
+      <Box display="flex" flexWrap="wrap" gap={1} justifyContent="center">
+        <CompactTile icon={<Thermostat color="error" />} label="Máx" value={`${weather.high}°`} />
+        <CompactTile icon={<Thermostat color="info" />} label="Mín" value={`${weather.low}°`} />
+        <CompactTile icon={<Air color="primary" />} label="Viento" value={`${weather.wind_speed} km/h`} />
+        <CompactTile icon={<Brightness5 sx={{ color: '#ff9800' }} />} label="Amanecer" value={formatTime(weather.sunrise)} />
+        <CompactTile icon={<Brightness3 sx={{ color: '#6a1b9a' }} />} label="Atardecer" value={formatTime(weather.sunset)} />
+      </Box>
+
+      {/* Pronóstico por días */}
+      {forecast.length > 0 && (
+        <Box mt={2}>
+          <Typography variant="subtitle1" fontWeight={500} mb={1}>Pronóstico 5 días</Typography>
+          <Box display="flex" overflow="auto" gap={1} pb={2}>
+            {forecast.map((day, index) => (
+              <Card key={index} sx={{ minWidth: 140, borderRadius: 2 }}>
+                <CardContent sx={{ p: 1.5 }}>
+                  <Typography variant="subtitle2" fontWeight={500} textAlign="center">
+                    {day.day} {day.date}
+                  </Typography>
+                  
+                  <Box display="flex" justifyContent="center" my={1}>
+                    <Avatar
+                      src={`https://openweathermap.org/img/wn/${day.icon}@2x.png`}
+                      sx={{ width: 50, height: 50 }}
+                    />
+                  </Box>
+                  
+                  <Box height={60} mt={1}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={day.hourly}>
+                        <XAxis dataKey="time" hide />
+                        <Line
+                          type="monotone"
+                          dataKey="temp"
+                          stroke={theme.palette.primary.main}
+                          strokeWidth={2}
+                          dot={{ r: 2 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </Box>
+                  
+                  <Box display="flex" justifyContent="space-between" mt={1}>
+                    <Typography variant="body2" color="error">{day.high}°</Typography>
+                    <Typography variant="body2" color="text.secondary">{day.low}°</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Box>
+      )}
+    </Box>
   );
 };
 
+const CompactTile = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
+  <Card sx={{ minWidth: 90, borderRadius: 2 }}>
+    <CardContent sx={{ p: 1, textAlign: 'center' }}>
+      <Box sx={{ color: 'text.secondary' }}>{icon}</Box>
+      <Typography variant="caption">{label}</Typography>
+      <Typography variant="body2" fontWeight={500}>{value}</Typography>
+    </CardContent>
+  </Card>
+);
+
 export default WeatherDashboard;
+
+
+
+// import React, { useEffect, useState } from 'react';
+// import axios from 'axios';
+// import {
+//   Box,
+//   Typography,
+//   CircularProgress,
+//   Avatar,
+//   Card,
+//   CardContent,
+//   useTheme,
+//   Alert,
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableContainer,
+//   TableHead,
+//   TableRow,
+//   Paper
+// } from '@mui/material';
+// import {
+//   Thermostat,
+//   Air,
+//   Brightness5,
+//   Brightness3,
+//   LocationOn,
+//   WaterDrop,
+//   WbSunny,
+//   NightsStay
+// } from '@mui/icons-material';
+// import { LineChart, Line, XAxis, ResponsiveContainer } from 'recharts';
+
+// interface WeatherData {
+//   temp: number;
+//   high: number;
+//   low: number;
+//   condition: string;
+//   icon: string;
+//   wind_speed: number;
+//   sunrise: number;
+//   sunset: number;
+//   humidity: number;
+// }
+
+// interface DailyForecast {
+//   date: string;
+//   day: string;
+//   high: number;
+//   low: number;
+//   icon: string;
+//   humidity: number;
+//   wind_speed: number;
+//   hourly: {
+//     time: string;
+//     temp: number;
+//   }[];
+// }
+
+// const WeatherDashboard = () => {
+//   const theme = useTheme();
+//   const [weather, setWeather] = useState<WeatherData | null>(null);
+//   const [forecast, setForecast] = useState<DailyForecast[]>([]);
+//   const [extendedForecast, setExtendedForecast] = useState<DailyForecast[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
+//   const MENDOZA_COORDS = { lat: -32.8908, lon: -68.8272 };
+
+//   const fetchWeatherData = async () => {
+//     try {
+//       setLoading(true);
+//       setError(null);
+//       const { lat, lon } = MENDOZA_COORDS;
+
+//       if (!process.env.NEXT_PUBLIC_WEATHER_KEY) {
+//         throw new Error('API key no configurada');
+//       }
+
+//       // Datos actuales
+//       const currentRes = await axios.get(
+//         `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric&lang=es`
+//       );
+
+//       // Pronóstico de 5 días (detallado)
+//       const forecastRes = await axios.get(
+//         `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric&lang=es&cnt=40`
+//       );
+
+//       // Pronóstico extendido de 16 días (incluyendo hoy)
+//       const extendedRes = await axios.get(
+//         `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&units=metric&lang=es&cnt=16`
+//       );
+
+//       const currentData = currentRes.data;
+//       const forecastData = forecastRes.data;
+//       const extendedData = extendedRes.data;
+
+//       // Procesar datos actuales
+//       setWeather({
+//         temp: Math.round(currentData.main.temp),
+//         high: Math.round(currentData.main.temp_max),
+//         low: Math.round(currentData.main.temp_min),
+//         condition: currentData.weather[0].description,
+//         icon: currentData.weather[0].icon,
+//         wind_speed: Math.round(currentData.wind.speed * 3.6),
+//         sunrise: currentData.sys.sunrise,
+//         sunset: currentData.sys.sunset,
+//         humidity: currentData.main.humidity
+//       });
+
+//       // Procesar pronóstico detallado (5 días)
+//       const dailyForecast: Record<string, DailyForecast> = {};
+
+//       forecastData.list.forEach((item: any) => {
+//         const date = new Date(item.dt * 1000);
+//         const dateKey = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+//         const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
+        
+//         if (!dailyForecast[dateKey]) {
+//           dailyForecast[dateKey] = {
+//             date: dateKey,
+//             day: dayName,
+//             high: Math.round(item.main.temp_max),
+//             low: Math.round(item.main.temp_min),
+//             icon: item.weather[0].icon,
+//             humidity: item.main.humidity,
+//             wind_speed: Math.round(item.wind.speed * 3.6),
+//             hourly: []
+//           };
+//         }
+
+//         dailyForecast[dateKey].high = Math.max(dailyForecast[dateKey].high, Math.round(item.main.temp_max));
+//         dailyForecast[dateKey].low = Math.min(dailyForecast[dateKey].low, Math.round(item.main.temp_min));
+
+//         dailyForecast[dateKey].hourly.push({
+//           time: date.toLocaleTimeString('es-ES', { hour: '2-digit' }),
+//           temp: Math.round(item.main.temp)
+//         });
+//       });
+
+//       setForecast(Object.values(dailyForecast).slice(0, 5));
+
+//       // Procesar pronóstico extendido (15 días)
+//       const processedExtended = extendedData.list.slice(1, 16).map((day: any) => ({
+//         date: new Date(day.dt * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
+//         day: new Date(day.dt * 1000).toLocaleDateString('es-ES', { weekday: 'short' }),
+//         high: Math.round(day.temp.max),
+//         low: Math.round(day.temp.min),
+//         icon: day.weather[0].icon,
+//         humidity: day.humidity,
+//         wind_speed: Math.round(day.speed * 3.6),
+//         hourly: [
+//           { time: 'Mañana', temp: Math.round(day.temp.morn) },
+//           { time: 'Tarde', temp: Math.round(day.temp.day) },
+//           { time: 'Noche', temp: Math.round(day.temp.eve) }
+//         ]
+//       }));
+
+//       setExtendedForecast(processedExtended);
+//       setLoading(false);
+//     } catch (err) {
+//       console.error('Error fetching weather data:', err);
+//       setError('No se pudo cargar los datos del clima. Verifica tu conexión o API key.');
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchWeatherData();
+//   }, []);
+
+//   const formatTime = (timestamp: number) => {
+//     return new Date(timestamp * 1000).toLocaleTimeString([], {
+//       hour: '2-digit',
+//       minute: '2-digit',
+//     });
+//   };
+
+//   if (loading) {
+//     return (
+//       <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+//         <CircularProgress />
+//       </Box>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <Box p={3}>
+//         <Alert severity="error">{error}</Alert>
+//         <Typography variant="body1" mt={2}>
+//           ¿Necesitas ayuda? Verifica:
+//         </Typography>
+//         <ul>
+//           <li>Tu conexión a internet</li>
+//           <li>Que la API key esté configurada correctamente</li>
+//           <li>Que las coordenadas sean válidas</li>
+//         </ul>
+//       </Box>
+//     );
+//   }
+
+//   if (!weather) {
+//     return (
+//       <Box p={3}>
+//         <Alert severity="warning">No se encontraron datos meteorológicos</Alert>
+//       </Box>
+//     );
+//   }
+
+//   return (
+//     <Box
+//       p={2}
+//       maxWidth="1200px"
+//       mx="auto"
+//       display="flex"
+//       flexDirection="column"
+//       gap={2}
+//     >
+//       {/* Encabezado */}
+//       <Box display="flex" justifyContent="space-between" alignItems="center">
+//         <Typography variant="h6" fontWeight={500} display="flex" alignItems="center" gap={0.5}>
+//           <LocationOn fontSize="small" /> Clima en Mendoza
+//         </Typography>
+//         <Box display="flex" alignItems="center" gap={1}>
+//           <Avatar
+//             src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+//             sx={{ width: 50, height: 50 }}
+//           />
+//           <Box textAlign="right">
+//             <Typography variant="h4" fontWeight={600}>
+//               {weather.temp}°C
+//             </Typography>
+//             <Typography variant="caption" textTransform="capitalize">
+//               {weather.condition}
+//             </Typography>
+//           </Box>
+//         </Box>
+//       </Box>
+
+//       {/* Datos principales */}
+//       <Box display="flex" flexWrap="wrap" gap={1} justifyContent="center">
+//         <CompactTile icon={<Thermostat color="error" />} label="Máx" value={`${weather.high}°`} />
+//         <CompactTile icon={<Thermostat color="info" />} label="Mín" value={`${weather.low}°`} />
+//         <CompactTile icon={<Air color="primary" />} label="Viento" value={`${weather.wind_speed} km/h`} />
+//         <CompactTile icon={<WaterDrop color="info" />} label="Humedad" value={`${weather.humidity}%`} />
+//         <CompactTile icon={<Brightness5 sx={{ color: '#ff9800' }} />} label="Amanecer" value={formatTime(weather.sunrise)} />
+//         <CompactTile icon={<Brightness3 sx={{ color: '#6a1b9a' }} />} label="Atardecer" value={formatTime(weather.sunset)} />
+//       </Box>
+
+//       {/* Pronóstico detallado (5 días) */}
+//       {forecast.length > 0 && (
+//         <Box mt={2}>
+//           <Typography variant="subtitle1" fontWeight={500} mb={1}>Pronóstico detallado (5 días)</Typography>
+//           <Box display="flex" overflow="auto" gap={1} pb={2}>
+//             {forecast.map((day, index) => (
+//               <Card key={index} sx={{ minWidth: 140, borderRadius: 2 }}>
+//                 <CardContent sx={{ p: 1.5 }}>
+//                   <Typography variant="subtitle2" fontWeight={500} textAlign="center">
+//                     {day.day} {day.date}
+//                   </Typography>
+                  
+//                   <Box display="flex" justifyContent="center" my={1}>
+//                     <Avatar
+//                       src={`https://openweathermap.org/img/wn/${day.icon}@2x.png`}
+//                       sx={{ width: 50, height: 50 }}
+//                     />
+//                   </Box>
+                  
+//                   <Box height={60} mt={1}>
+//                     <ResponsiveContainer width="100%" height="100%">
+//                       <LineChart data={day.hourly}>
+//                         <XAxis dataKey="time" hide />
+//                         <Line
+//                           type="monotone"
+//                           dataKey="temp"
+//                           stroke={theme.palette.primary.main}
+//                           strokeWidth={2}
+//                           dot={{ r: 2 }}
+//                         />
+//                       </LineChart>
+//                     </ResponsiveContainer>
+//                   </Box>
+                  
+//                   <Box display="flex" justifyContent="space-between" mt={1}>
+//                     <Typography variant="body2" color="error">{day.high}°</Typography>
+//                     <Typography variant="body2" color="text.secondary">{day.low}°</Typography>
+//                   </Box>
+                  
+//                   <Box display="flex" justifyContent="space-between" mt={1}>
+//                     <Box display="flex" alignItems="center" gap={0.5}>
+//                       <Air fontSize="small" />
+//                       <Typography variant="caption">{day.wind_speed} km/h</Typography>
+//                     </Box>
+//                     <Box display="flex" alignItems="center" gap={0.5}>
+//                       <WaterDrop fontSize="small" />
+//                       <Typography variant="caption">{day.humidity}%</Typography>
+//                     </Box>
+//                   </Box>
+//                 </CardContent>
+//               </Card>
+//             ))}
+//           </Box>
+//         </Box>
+//       )}
+
+//       {/* Pronóstico extendido (15 días) */}
+//       {extendedForecast.length > 0 && (
+//         <Box mt={2}>
+//           <Typography variant="subtitle1" fontWeight={500} mb={1}>Pronóstico extendido (15 días)</Typography>
+//           <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+//             <Table size="small" aria-label="Pronóstico extendido">
+//               <TableHead>
+//                 <TableRow>
+//                   <TableCell>Día</TableCell>
+//                   <TableCell align="center">Condición</TableCell>
+//                   <TableCell align="right">Máx</TableCell>
+//                   <TableCell align="right">Mín</TableCell>
+//                   <TableCell align="right">Viento</TableCell>
+//                   <TableCell align="right">Humedad</TableCell>
+//                   <TableCell align="center">Mañana</TableCell>
+//                   <TableCell align="center">Tarde</TableCell>
+//                   <TableCell align="center">Noche</TableCell>
+//                 </TableRow>
+//               </TableHead>
+//               <TableBody>
+//                 {extendedForecast.map((day, index) => (
+//                   <TableRow key={index}>
+//                     <TableCell component="th" scope="row">
+//                       <Box display="flex" alignItems="center" gap={1}>
+//                         <Typography variant="body2" fontWeight={500}>{day.day}</Typography>
+//                         <Typography variant="caption" color="text.secondary">{day.date}</Typography>
+//                       </Box>
+//                     </TableCell>
+//                     <TableCell align="center">
+//                       <Avatar
+//                         src={`https://openweathermap.org/img/wn/${day.icon}.png`}
+//                         sx={{ width: 30, height: 30, mx: 'auto' }}
+//                       />
+//                     </TableCell>
+//                     <TableCell align="right" sx={{ color: theme.palette.error.main }}>{day.high}°</TableCell>
+//                     <TableCell align="right" sx={{ color: theme.palette.info.main }}>{day.low}°</TableCell>
+//                     <TableCell align="right">
+//                       <Box display="flex" alignItems="center" justifyContent="flex-end" gap={0.5}>
+//                         <Air fontSize="small" />
+//                         <Typography variant="body2">{day.wind_speed} km/h</Typography>
+//                       </Box>
+//                     </TableCell>
+//                     <TableCell align="right">
+//                       <Box display="flex" alignItems="center" justifyContent="flex-end" gap={0.5}>
+//                         <WaterDrop fontSize="small" />
+//                         <Typography variant="body2">{day.humidity}%</Typography>
+//                       </Box>
+//                     </TableCell>
+//                     <TableCell align="center">{day.hourly[0].temp}°</TableCell>
+//                     <TableCell align="center">{day.hourly[1].temp}°</TableCell>
+//                     <TableCell align="center">{day.hourly[2].temp}°</TableCell>
+//                   </TableRow>
+//                 ))}
+//               </TableBody>
+//             </Table>
+//           </TableContainer>
+//         </Box>
+//       )}
+//     </Box>
+//   );
+// };
+
+// const CompactTile = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
+//   <Card sx={{ minWidth: 90, borderRadius: 2 }}>
+//     <CardContent sx={{ p: 1, textAlign: 'center' }}>
+//       <Box sx={{ color: 'text.secondary' }}>{icon}</Box>
+//       <Typography variant="caption">{label}</Typography>
+//       <Typography variant="body2" fontWeight={500}>{value}</Typography>
+//     </CardContent>
+//   </Card>
+// );
+
+// export default WeatherDashboard;

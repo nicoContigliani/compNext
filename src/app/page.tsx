@@ -45,10 +45,10 @@ export default function Home() {
   }, []);
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 2 }}>
       {/* Header con Clima */}
       <Box sx={{ mb: 4 }}>
-        <Paper elevation={3} sx={{ p: 3 }}>
+        <Paper elevation={3} sx={{ p: 1 }}>
           <Typography variant="h5" gutterBottom>
             Pronóstico del Clima
           </Typography>
@@ -61,11 +61,11 @@ export default function Home() {
         sx={{
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
-          gap: 4,
+          gap: 1,
         }}
       >
         <Box sx={{ flex: 1 }}>
-          <Paper elevation={3} sx={{ p: 3 }}>
+          <Paper elevation={4} sx={{ p: 1 }}>
             <Typography variant="h5" gutterBottom>
               Noticias Destacadas
             </Typography>

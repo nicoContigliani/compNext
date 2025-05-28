@@ -32,6 +32,7 @@ import {
   Public as GlobeIcon,
   Menu as MenuIcon,
   Close as CloseIcon,
+  Image as ImageIcon,
 } from '@mui/icons-material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useNewsAggregator } from '@/hooks/useNewsAggregator';
@@ -94,48 +95,69 @@ export default function NewsAggregator() {
       <Box
         sx={{
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           minHeight: '100vh',
-          flexDirection: 'column',
           backgroundColor: COLORS.background,
-          p: 2,
+          p: 3,
+          gap: 4,
         }}
       >
-        <hr />
-        <WeatherComponent
-        
-        />
-        <hr />
+        {/* Weather Card */}
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: 600,
+            boxShadow: 3,
+            borderRadius: 3,
+            backgroundColor: 'white',
+            p: 3,
+          }}
+        >
+          <WeatherComponent />
+        </Box>
+
+        {/* Loading Spinner */}
         <motion.div
           initial={{ scale: 0.8 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
+          transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }}
         >
-          <CircularProgress size={60} sx={{ mb: 3, color: COLORS.primary }} />
+          <CircularProgress size={60} sx={{ color: COLORS.primary }} />
         </motion.div>
 
+        {/* Texts */}
+        <Box textAlign="center">
+          <Typography variant="h5" sx={{ color: COLORS.textPrimary, mb: 1 }}>
+            Cargando y agrupando noticias...
+          </Typography>
+          <Typography variant="body2" sx={{ color: COLORS.textSecondary }}>
+            Analizando similitudes entre títulos
+          </Typography>
+        </Box>
 
-        <Typography variant="h5" sx={{ mb: 1, color: COLORS.textPrimary }}>
-          Cargando y agrupando noticias...
-        </Typography>
-        <Typography variant="body2" sx={{ mb: 3, color: COLORS.textSecondary }}>
-          Analizando similitudes entre títulos
-        </Typography>
-
+        {/* Animated List */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ staggerChildren: 0.1 }}
         >
-          {['Conectando con fuentes de noticias', 'Extrayendo contenido', 'Agrupando por similitud'].map((text, index) => (
+          {[
+            'Conectando con fuentes de noticias',
+            'Extrayendo contenido',
+            'Agrupando por similitud',
+          ].map((text, index) => (
             <motion.div
               key={index}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.3, delay: index * 0.2 }}
             >
-              <Typography variant="body2" sx={{ mb: 1, color: COLORS.textSecondary }}>
+              <Typography
+                variant="body2"
+                sx={{ color: COLORS.textSecondary, mb: 0.5 }}
+              >
                 • {text}
               </Typography>
             </motion.div>
@@ -145,9 +167,10 @@ export default function NewsAggregator() {
     );
   }
 
+
   if (error) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -239,10 +262,10 @@ export default function NewsAggregator() {
                 borderRight: `1px solid ${COLORS.border}`,
               }}
             >
-              {/* Header del Sidebar */}
+              {/* Encabezado */}
               <Box sx={{ p: 2, borderBottom: `1px solid ${COLORS.border}` }}>
                 {!isMobile && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
                       <ListIcon sx={{ mr: 1 }} />
                       Temario
@@ -261,6 +284,7 @@ export default function NewsAggregator() {
                   </Alert>
                 )}
 
+                {/* Buscador */}
                 <TextField
                   fullWidth
                   size="small"
@@ -276,13 +300,9 @@ export default function NewsAggregator() {
                   sx={{ mb: 2 }}
                 />
 
+                {/* Chips de resumen */}
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <Chip
-                    label={`${gruposSidebar.length} temas`}
-                    size="small"
-                    variant="outlined"
-                    sx={{ mb: 1 }}
-                  />
+                  <Chip label={`${gruposSidebar.length} temas`} size="small" variant="outlined" sx={{ mb: 1 }} />
                   <Chip
                     label={`${gruposSidebar.reduce((acc, grupo) => acc + grupo.noticias.length, 0)} noticias`}
                     size="small"
@@ -290,11 +310,9 @@ export default function NewsAggregator() {
                     sx={{ mb: 1 }}
                   />
                 </Box>
-
-
               </Box>
 
-              {/* Lista de Temas */}
+              {/* Lista de grupos */}
               <Box sx={{ flex: 1, overflow: 'auto', p: 1 }}>
                 {gruposSidebar.map((grupo) => (
                   <motion.div
@@ -309,15 +327,19 @@ export default function NewsAggregator() {
                       sx={{
                         mb: 2,
                         cursor: 'pointer',
-                        border: grupoSeleccionado === grupo.id ? `2px solid ${COLORS.primary}` : `1px solid ${COLORS.border}`,
-                        backgroundColor: grupoSeleccionado === grupo.id ? '#f0f4ff' : COLORS.cardBackground,
+                        border: grupoSeleccionado === grupo.id
+                          ? `2px solid ${COLORS.primary}`
+                          : `1px solid ${COLORS.border}`,
+                        backgroundColor: grupoSeleccionado === grupo.id
+                          ? '#f0f4ff'
+                          : COLORS.cardBackground,
                       }}
                       onClick={() => {
                         setGrupoSeleccionado(grupo.id);
                         if (isMobile) setSidebarOpen(false);
                       }}
                     >
-                      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                      <CardContent sx={{ p: 2 }}>
                         <Typography
                           variant="body2"
                           sx={{
@@ -348,7 +370,7 @@ export default function NewsAggregator() {
                           ))}
                         </Box>
 
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Typography variant="caption" sx={{ color: COLORS.textSecondary }}>
                             {grupo.noticias.length} noticia{grupo.noticias.length !== 1 ? 's' : ''}
                           </Typography>
@@ -363,7 +385,7 @@ export default function NewsAggregator() {
                 ))}
               </Box>
 
-              {/* Paginación del Sidebar */}
+              {/* Paginación */}
               {totalPaginasSidebar > 1 && (
                 <Box sx={{ p: 2, borderTop: `1px solid ${COLORS.border}` }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -416,120 +438,128 @@ export default function NewsAggregator() {
       {/* Contenido Principal */}
       <Box sx={{
         flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        marginLeft: isMobile ? 0 : '320px',
+        overflow: 'auto',
+        p: isMobile ? 2 : 4,
+        backgroundColor: COLORS.background,
       }}>
-        {/* Header Principal - Desktop */}
-        {!isMobile && (
-          <Paper sx={{
-            p: 3,
-            borderRadius: 0,
-            borderBottom: `1px solid ${COLORS.border}`,
-            backgroundColor: COLORS.cardBackground,
-          }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Box>
-                <Typography variant="h4" sx={{ mb: 1, fontWeight: 'bold', color: COLORS.textPrimary }}>
-                  Agregador de Noticias
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <ClockIcon sx={{ mr: 0.5, fontSize: 16, color: COLORS.textSecondary }} />
-                    <Typography variant="body2" sx={{ color: COLORS.textSecondary }}>
-                      Actualizado: {ultimaActualizacion.toLocaleTimeString()}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <GlobeIcon sx={{ mr: 0.5, fontSize: 16, color: COLORS.textSecondary }} />
-                    <Typography variant="body2" sx={{ color: COLORS.textSecondary }}>
-                      Fuentes: {fuentes.map((f) => f.nombre).join(', ')}
-                    </Typography>
-                  </Box>
-                </Box>
+        {grupoActual ? (
+          <Box>
+            {/* Título y metadatos */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h4" sx={{
+                mb: 2,
+                fontWeight: 700,
+                color: COLORS.textPrimary,
+              }}>
+                📌 {grupoActual.tema}
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 2 }}>
+                {grupoActual.palabrasClave.map((palabra, idx) => (
+                  <Chip
+                    key={idx}
+                    label={`#${palabra}`}
+                    variant="outlined"
+                    sx={{
+                      backgroundColor: COLORS.cardBackground,
+                      borderColor: COLORS.border,
+                      color: COLORS.textSecondary,
+                      fontWeight: 500,
+                    }}
+                  />
+                ))}
               </Box>
-              {modoDemo && (
-                <Chip
-                  label="Modo Demo"
-                  variant="outlined"
-                  color="warning"
-                  sx={{ borderColor: COLORS.warning, color: COLORS.warning }}
-                />
-              )}
+
+              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                <Typography variant="body2" sx={{ color: COLORS.textSecondary }}>
+                  📰 {grupoActual.noticias.length} noticias encontradas
+                </Typography>
+                <Typography variant="body2" sx={{ color: COLORS.textSecondary }}>
+                  🌐 {new Set(grupoActual.noticias.map((n) => n.fuente)).size} fuentes diferentes
+                </Typography>
+              </Box>
             </Box>
-          </Paper>
-        )}
 
-        {/* Contenido de Noticias */}
-        <Box sx={{
-          flex: 1,
-          overflow: 'auto',
-          p: isMobile ? 2 : 3,
-          backgroundColor: COLORS.background,
-        }}>
-          {grupoActual ? (
-            <Box>
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h5" sx={{
-                  mb: 2,
-                  fontWeight: '600',
-                  color: COLORS.textPrimary,
-                }}>
-                  {grupoActual.tema}
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                  {grupoActual.palabrasClave.map((palabra, idx) => (
-                    <Chip
-                      key={idx}
-                      label={palabra}
-                      variant="outlined"
-                      sx={{
-                        backgroundColor: COLORS.background,
-                        borderColor: COLORS.border,
-                      }}
-                    />
-                  ))}
-                </Box>
-                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-                  <Typography variant="body2" sx={{ color: COLORS.textSecondary }}>
-                    {grupoActual.noticias.length} noticias relacionadas
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: COLORS.textSecondary }}>
-                    {new Set(grupoActual.noticias.map((n) => n.fuente)).size} fuentes diferentes
-                  </Typography>
-                </Box>
-              </Box>
+            <Divider sx={{ mb: 3, borderColor: COLORS.border }} />
 
-              <Divider sx={{ mb: 3, borderColor: COLORS.border }} />
-
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <AnimatePresence>
-                  {grupoActual.noticias.map((noticia, index) => (
-                    <motion.div
-                      key={index}
-                      variants={cardVariants}
-                      initial="initial"
-                      animate="animate"
-                      whileHover="hover"
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Card sx={{
-                        backgroundColor: COLORS.cardBackground,
-                        border: `1px solid ${COLORS.border}`,
-                      }}>
-                        <CardContent sx={{ p: isMobile ? 2 : 3 }}>
+            {/* Lista de noticias */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <AnimatePresence>
+                {grupoActual.noticias.map((noticia, index) => (
+                  <motion.div
+                    key={index}
+                    variants={cardVariants}
+                    initial="initial"
+                    animate="animate"
+                    whileHover="hover"
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card elevation={3} sx={{
+                      backgroundColor: COLORS.cardBackground,
+                      borderRadius: 3,
+                      border: `1px solid ${COLORS.border}`,
+                      transition: 'transform 0.3s',
+                    }}>
+                      <CardContent sx={{ p: 0 }}>
+                        <Box sx={{
+                          display: 'flex',
+                          flexDirection: isMobile ? 'column' : 'row',
+                          alignItems: 'stretch',
+                        }}>
+                          {/* Sección de imagen */}
                           <Box sx={{
+                            width: isMobile ? '100%' : '200px',
+                            minHeight: isMobile ? '150px' : 'auto',
+                            backgroundColor: '#f0f0f0',
                             display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'start',
-                            gap: 2,
-                            flexDirection: isMobile ? 'column' : 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            borderRight: isMobile ? 'none' : `1px solid ${COLORS.border}`,
+                            borderBottom: isMobile ? `1px solid ${COLORS.border}` : 'none',
                           }}>
-                            <Box sx={{ flex: 1 }}>
+                            {noticia.imagen ? (
+                              <img
+                                src={noticia.imagen}
+                                alt={noticia.titulo}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                }}
+                              />
+                            ) : (
+                              <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                p: 2,
+                                color: COLORS.textSecondary,
+                              }}>
+                                <ImageIcon sx={{ fontSize: 40, mb: 1 }} />
+                                <Typography variant="caption" align="center">
+                                  Imagen no disponible
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+
+                          {/* Sección de contenido */}
+                          <Box sx={{
+                            flex: 1,
+                            p: isMobile ? 2 : 3,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                          }}>
+                            <Box>
                               <Typography variant="h6" sx={{
-                                mb: 2,
-                                lineHeight: 1.3,
+                                mb: 1,
+                                lineHeight: 1.4,
                                 color: COLORS.textPrimary,
+                                fontWeight: 600,
                               }}>
                                 {noticia.titulo}
                               </Typography>
@@ -537,19 +567,21 @@ export default function NewsAggregator() {
                               <Box sx={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 1,
+                                gap: 1.5,
                                 flexWrap: 'wrap',
+                                mb: 2,
                               }}>
                                 <Chip
                                   label={noticia.fuente}
                                   size="small"
                                   sx={{
                                     ...getFuenteColor(noticia.dominio),
+                                    fontWeight: 500,
                                     border: '1px solid',
                                     borderColor: getFuenteColor(noticia.dominio).color,
                                   }}
                                 />
-                                <Typography variant="body2" sx={{ color: COLORS.textSecondary }}>
+                                <Typography variant="caption" sx={{ color: COLORS.textSecondary }}>
                                   {noticia.dominio}
                                 </Typography>
                                 {modoDemo && (
@@ -567,90 +599,103 @@ export default function NewsAggregator() {
                               </Box>
                             </Box>
 
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              startIcon={<OpenInNewIcon />}
-                              href={noticia.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              sx={{
-                                flexShrink: 0,
-                                borderColor: COLORS.primary,
-                                color: COLORS.primary,
-                                '&:hover': {
-                                  backgroundColor: COLORS.primary,
-                                  color: 'white',
-                                }
-                              }}
-                            >
-                              Leer
-                            </Button>
+                            <Box sx={{
+                              display: 'flex',
+                              justifyContent: 'flex-end',
+                            }}>
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<OpenInNewIcon />}
+                                href={noticia.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                  flexShrink: 0,
+                                  borderColor: COLORS.primary,
+                                  color: COLORS.primary,
+                                  borderRadius: 2,
+                                  '&:hover': {
+                                    backgroundColor: COLORS.primary,
+                                    color: '#fff',
+                                  }
+                                }}
+                              >
+                                Leer más
+                              </Button>
+                            </Box>
                           </Box>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </Box>
-          ) : (
-            <Box sx={{
-              textAlign: 'center',
-              py: 8,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100%',
+          </Box>
+        ) : (
+          // Mensaje sin selección
+          <Box sx={{
+            textAlign: 'center',
+            py: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+          }}>
+            <motion.div
+              animate={{
+                rotate: [0, 5, -5, 0],
+                scale: [1, 1.1, 1],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                repeatType: 'reverse',
+              }}
+            >
+              <ListIcon sx={{
+                fontSize: 64,
+                color: COLORS.textSecondary,
+                mb: 2,
+              }} />
+            </motion.div>
+
+            <Typography variant="h6" sx={{
+              mb: 1,
+              color: COLORS.textSecondary,
+              fontWeight: 500,
             }}>
-              <motion.div
-                animate={{
-                  rotate: [0, 10, -10, 0],
-                  scale: [1, 1.1, 1],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatType: 'reverse',
+              👋 ¡Hola! Aún no has seleccionado un tema
+            </Typography>
+
+            <Typography variant="body2" sx={{
+              color: COLORS.textSecondary,
+              maxWidth: '320px',
+            }}>
+              Elige un tema desde el panel lateral para ver las noticias relacionadas y descubrir más contenido interesante.
+            </Typography>
+
+            {isMobile && (
+              <Button
+                variant="contained"
+                onClick={toggleSidebar}
+                sx={{
+                  mt: 4,
+                  backgroundColor: COLORS.primary,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  '&:hover': {
+                    backgroundColor: '#303f9f',
+                  }
                 }}
               >
-                <ListIcon sx={{
-                  fontSize: 64,
-                  color: COLORS.textSecondary,
-                  mb: 2,
-                }} />
-              </motion.div>
-              <Typography variant="h6" sx={{
-                mb: 1,
-                color: COLORS.textSecondary,
-              }}>
-                Selecciona un tema
-              </Typography>
-              <Typography variant="body2" sx={{
-                color: COLORS.textSecondary,
-                maxWidth: '300px',
-              }}>
-                Elige un tema del panel lateral para ver las noticias relacionadas
-              </Typography>
-              {isMobile && (
-                <Button
-                  variant="contained"
-                  onClick={toggleSidebar}
-                  sx={{
-                    mt: 3,
-                    backgroundColor: COLORS.primary,
-                    '&:hover': {
-                      backgroundColor: '#303f9f',
-                    }
-                  }}
-                >
-                  Mostrar temas
-                </Button>
-              )}
-            </Box>
-          )}
-        </Box>
+                Ver temas disponibles
+              </Button>
+            )}
+          </Box>
+        )}
       </Box>
     </Box>
   );
