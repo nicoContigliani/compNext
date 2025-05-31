@@ -1,20 +1,20 @@
 import * as cheerio from "cheerio";
 
 const fuentesInfo: Record<string, string> = {
-  "mdzol.com": "MDZ Online",
-  "losandes.com.ar": "Los Andes",
-  "elsol.com.ar": "El Sol",
-  "diariouno.com.ar": "Diario Uno",
-  "infobae.com": "Infobae",
-  "eldestapeweb.com": "El Destape",
-  "lanacion.com.ar": "La Nacion",
-  "ambito.com": "Ámbito",
-  "clarin.com": "Clarin",
-  "pagina12.com.ar": "Pagina 12",
-  "memo.com.ar": "Memo",
-  "plusnoticias.com": "Plus Noticias",
-  "tycsports.com": "TyC Sports",
-  "ole.com.ar": "Olé",
+  // "mdzol.com": "MDZ Online",
+  // "losandes.com.ar": "Los Andes",
+  // "elsol.com.ar": "El Sol",
+  // "diariouno.com.ar": "Diario Uno",
+  // "infobae.com": "Infobae",
+  // "eldestapeweb.com": "El Destape",
+  // "lanacion.com.ar": "La Nacion",
+  // "ambito.com": "Ámbito",
+  // "clarin.com": "Clarin",
+  // "pagina12.com.ar": "Pagina 12",
+  // "memo.com.ar": "Memo",
+  // "plusnoticias.com": "Plus Noticias",
+  // "tycsports.com": "TyC Sports",
+  // "ole.com.ar": "Olé",
 };
 
 const SELECTORES_NOTICIAS = [
